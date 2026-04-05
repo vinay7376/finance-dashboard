@@ -146,7 +146,7 @@ npm install
 npm run dev
 ```
 
-📁 Project Structure
+## 📁 Project Structure
 src/
 │
 ├── components/
@@ -180,18 +180,25 @@ src/
 ├── main.jsx
 └── index.css
 
-📌 Notes
-This project uses mock/local data (no backend)
-Focus is on frontend logic, UI, and interaction design
-Insights are dynamically calculated from transaction data
-🙌 Author
+
+## 📝 Notes
+
+- This project uses mock/local data (no backend)  
+- Focus is on frontend logic, UI, and interaction design  
+- Insights are dynamically calculated from transaction data
+
+## 🙌 Author
 
 Vinay Pal
 Frontend Developer Intern Applicant
 
-📎 Submission
-GitHub Repository: https://github.com/vinay7376/finance-dashboard
-Live Demo: https://finance-dashboard-eight-snowy.vercel.app/
-⭐ Final Note
+## 📎 Submission
+- 🔗 **GitHub Repository:**  
+  [Click Here](https://github.com/vinay7376/finance-dashboard)
 
-This project reflects my approach to building a clean, functional, and user-friendly frontend application while keeping the implementation simple and scalable.
+- 🌐 **Live Demo:**  
+  [View Project](https://finance-dashboard-eight-snowy.vercel.app/)
+
+## ⭐ Final Note
+
+This project reflects my approach to building a **clean, functional, and user-friendly frontend application** while keeping the implementation simple and scalable.
