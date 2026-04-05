@@ -1,0 +1,25 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Sidebar from "./components/layout/Sidebar";
+import Dashboard from "./pages/Dashboard";
+import Transactions from "./pages/Transactions";
+import Insights from "./pages/Insights";
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <div className="flex min-h-screen bg-white dark:bg-[#020617] text-black dark:text-white transition-colors duration-300">
+
+        <Sidebar />
+
+        <div className="flex-1 p-4 lg:ml-64">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/insights" element={<Insights />} />
+          </Routes>
+        </div>
+
+      </div>
+    </BrowserRouter>
+  );
+}
