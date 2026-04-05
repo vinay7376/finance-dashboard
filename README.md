@@ -11,6 +11,16 @@ The goal of this project is to demonstrate frontend development skills including
 🔗 https://finance-dashboard-eight-snowy.vercel.app/
 
 ---
+## 📸 Screenshots
+
+### Dashboard
+![Dashboard](public/screenshots/dashboard.png)
+
+### Transactions
+![Transactions](public/screenshots/transactions.png)
+
+### Insights
+![Insights](public/screenshots/insights.png)
 
 ## 📌 Objective
 
