@@ -1,4 +1,3 @@
-
 import { useFinance } from "../hooks/useFinance";
 import {
   BarChart,
@@ -12,7 +11,6 @@ import {
 export default function Insights() {
   const { transactions } = useFinance();
 
-  // 🔥 CATEGORY DATA
   const categoryMap = {};
   const countMap = {};
 
@@ -31,20 +29,18 @@ export default function Insights() {
     count: countMap[key],
   }));
 
-  // 🔥 STATS
   const total = transactions.reduce((a, t) => a + t.amount, 0);
 
   const topCategory =
-    data.sort((a, b) => b.value - a.value)[0] || {};
+    [...data].sort((a, b) => b.value - a.value)[0] || {};
 
   const mostTx =
-    data.sort((a, b) => b.count - a.count)[0] || {};
+    [...data].sort((a, b) => b.count - a.count)[0] || {};
 
   const avg = Math.floor(total / (transactions.length || 1));
 
-  const savingsRate = Math.floor(Math.random() * 100); // demo
+  const savingsRate = Math.floor(Math.random() * 100);
 
-  // 🔥 MONTHLY DATA (fake for chart)
   const monthly = [
     { name: "Oct 2025", income: 60000, expense: 2000 },
     { name: "Nov 2025", income: 80000, expense: 3000 },
@@ -55,45 +51,55 @@ export default function Insights() {
   ];
 
   return (
-    <div>
-     
-
-      {/* ✅ FIX: hidden added (no deletion) */}
-      <h1 className="hidden text-2xl font-bold mb-6">Insights</h1>
+    <div className="space-y-6">
 
       {/* 🔥 CARDS */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-        <div className="card">
-          <p className="text-gray-400 text-sm">TOP SPENDING CATEGORY</p>
-          <h2 className="text-lg font-semibold mt-2">{topCategory.name}</h2>
-          <p className="text-gray-400">₹{topCategory.value}</p>
-        </div>
+        {[ 
+          {
+            title: "TOP SPENDING CATEGORY",
+            value: topCategory.name,
+            sub: `₹${topCategory.value || 0}`,
+          },
+          {
+            title: "MOST TRANSACTIONS IN",
+            value: mostTx.name,
+            sub: `${mostTx.count || 0} transactions`,
+          },
+          {
+            title: "AVG MONTHLY SPEND",
+            value: `₹${avg}`,
+            sub: "per active month",
+          },
+          {
+            title: "SAVINGS RATE",
+            value: `${savingsRate}%`,
+            sub: "Great!",
+          },
+        ].map((card, i) => (
+          <div
+            key={i}
+            className="bg-white dark:bg-[#0f172a] p-4 rounded-xl min-w-0 h-full"
+          >
+            <p className="text-xs text-gray-500 break-words">
+              {card.title}
+            </p>
 
-        <div className="card">
-          <p className="text-gray-400 text-sm">MOST TRANSACTIONS IN</p>
-          <h2 className="text-lg font-semibold mt-2">{mostTx.name}</h2>
-          <p className="text-gray-400">{mostTx.count} transactions</p>
-        </div>
+            <h2 className="text-base font-semibold mt-1 break-words">
+              {card.value || "-"}
+            </h2>
 
-        <div className="card">
-          <p className="text-gray-400 text-sm">AVG MONTHLY SPEND</p>
-          <h2 className="text-lg font-semibold mt-2">₹{avg}</h2>
-          <p className="text-gray-400">per active month</p>
-        </div>
-
-        <div className="card">
-          <p className="text-gray-400 text-sm">SAVINGS RATE</p>
-          <h2 className="text-lg font-semibold mt-2 text-green-400">
-            {savingsRate}%
-          </h2>
-          <p className="text-gray-400">Great!</p>
-        </div>
+            <p className="text-xs text-gray-400 break-words">
+              {card.sub}
+            </p>
+          </div>
+        ))}
 
       </div>
 
       {/* 🔥 BAR CHART */}
-      <div className="card mb-6">
+      <div className="bg-white dark:bg-[#0f172a] p-4 rounded-xl">
         <h2 className="mb-4">Income vs Expense Over Time</h2>
 
         <ResponsiveContainer width="100%" height={300}>
@@ -108,46 +114,47 @@ export default function Insights() {
       </div>
 
       {/* 🔥 CATEGORY TABLE */}
-      <div className="card">
+      <div className="bg-white dark:bg-[#0f172a] p-4 rounded-xl overflow-x-auto">
         <h2 className="mb-4">Category Breakdown</h2>
 
-        <div className="grid grid-cols-5 text-gray-400 text-sm border-b border-gray-700 pb-2">
-          <span>Category</span>
-          <span>Amount</span>
-          <span>% of Total</span>
-          <span>Tx Count</span>
-          <span>Bar</span>
-        </div>
+        <div className="min-w-[600px]">
 
-        {data.map((c, i) => {
-          const percent = ((c.value / total) * 100).toFixed(1);
+          <div className="grid grid-cols-5 text-gray-400 text-sm border-b pb-2">
+            <span>Category</span>
+            <span>Amount</span>
+            <span>%</span>
+            <span>Count</span>
+            <span>Bar</span>
+          </div>
 
-          return (
-            <div
-              key={i}
-              className="grid grid-cols-5 py-3 items-center border-b border-gray-800"
-            >
-              <span className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-pink-500"></span>
-                {c.name}
-              </span>
+          {data.map((c, i) => {
+            const percent = ((c.value / total) * 100).toFixed(1);
 
-              <span>₹{c.value}</span>
+            return (
+              <div
+                key={i}
+                className="grid grid-cols-5 py-3 items-center border-b"
+              >
+                <span className="flex items-center gap-2 break-words">
+                  <span className="w-2 h-2 rounded-full bg-pink-500"></span>
+                  {c.name}
+                </span>
 
-              <span>{percent}%</span>
+                <span>₹{c.value}</span>
+                <span>{percent}%</span>
+                <span>{c.count}</span>
 
-              <span>{c.count}</span>
-
-              <div className="w-full bg-gray-700 h-2 rounded">
-                <div
-                  className="bg-pink-500 h-2 rounded"
-                  style={{ width: `${percent}%` }}
-                />
+                <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded">
+                  <div
+                    className="bg-pink-500 h-2 rounded"
+                    style={{ width: `${percent}%` }}
+                  />
+                </div>
               </div>
-            </div>
-          );
-        })}
-        
+            );
+          })}
+
+        </div>
       </div>
     </div>
   );
