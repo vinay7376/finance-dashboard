@@ -53,7 +53,7 @@ export default function Insights() {
   return (
     <div className="space-y-6">
 
-      {/* 🔥 CARDS */}
+      {/*  CARDS */}
       <div className="grid grid-cols-4 gap-4 mb-6">
 
         <div className="card">
@@ -83,7 +83,7 @@ export default function Insights() {
         </div>
 
       </div>
-      {/* 🔥 BAR CHART */}
+      {/* BAR CHART */}
       <div
         className="
         bg-white dark:bg-[#0f172a] 
@@ -106,7 +106,7 @@ export default function Insights() {
         </ResponsiveContainer>
       </div>
 
-      {/* 🔥 CATEGORY TABLE */}
+      {/* CATEGORY TABLE */}
       <div
         className="
         bg-white dark:bg-[#0f172a] 
