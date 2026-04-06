@@ -21,7 +21,7 @@ export default function App() {
           setCollapsed={setCollapsed} 
         />
 
-        <div className="flex-1 p-4 md:ml-64">
+        <div className={`flex-1 p-4 transition-all duration-300 ${collapsed ? "md:ml-20" : "md:ml-64"}`}>
           <Topbar setIsOpen={setIsOpen} />
           
           <Routes>
