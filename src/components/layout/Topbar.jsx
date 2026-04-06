@@ -3,16 +3,14 @@ import { useState, useEffect } from "react";
 import { useFinance } from "../../hooks/useFinance";
 import { useLocation } from "react-router-dom";
 
-export default function Topbar() {
+export default function Topbar({ setIsOpen }) {
   const { transactions, role, setRole } = useFinance();
   const location = useLocation();
 
-  // ✅ LOAD THEME FROM LOCAL STORAGE (SAFE)
   const [dark, setDark] = useState(() => {
     return localStorage.getItem("theme") === "dark";
   });
 
-  // ✅ APPLY DARK MODE (GLOBAL)
   useEffect(() => {
     const root = document.documentElement;
 
@@ -25,7 +23,6 @@ export default function Topbar() {
     }
   }, [dark]);
 
-  // 📥 EXPORT CSV
   const exportCSV = () => {
     const headers = ["Date", "Title", "Category", "Type", "Amount"];
 
@@ -47,7 +44,6 @@ export default function Topbar() {
     link.click();
   };
 
-  // ✅ PAGE TITLE
   const getTitle = () => {
     switch (location.pathname) {
       case "/":
@@ -63,44 +59,48 @@ export default function Topbar() {
 
   return (
     <div className="flex justify-between items-center mb-6">
+
       {/* LEFT */}
-      <h1 className="text-xl font-semibold tracking-wide text-black dark:text-white">
-        {getTitle()}
-      </h1>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => setIsOpen(true)}
+          className="md:hidden text-2xl"
+        >
+          ☰
+        </button>
+
+        <h1 className="text-xl font-semibold tracking-wide text-black dark:text-white">
+          {getTitle()}
+        </h1>
+      </div>
 
       {/* RIGHT */}
       <div className="flex items-center gap-4">
 
-        {/* ROLE */}
         <select
           value={role}
           onChange={(e) => setRole(e.target.value)}
-          className="bg-white dark:bg-[#0f172a] text-black dark:text-white px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 text-sm"
+          className="bg-white dark:bg-[#0f172a] px-3 py-2 rounded-lg border text-sm"
         >
           <option value="admin">Admin</option>
           <option value="viewer">Viewer</option>
         </select>
 
-        {/* 🌗 TOGGLE */}
         <button
           onClick={() => setDark(!dark)}
-          className="p-2 rounded-lg bg-white dark:bg-[#0f172a] hover:bg-gray-200 dark:hover:bg-[#1e293b] transition"
+          className="p-2 rounded-lg bg-white dark:bg-[#0f172a]"
         >
-          {dark ? (
-            <Sun className="text-yellow-400" size={18} />
-          ) : (
-            <Moon className="text-blue-400" size={18} />
-          )}
+          {dark ? <Sun size={18} /> : <Moon size={18} />}
         </button>
 
-        {/* EXPORT */}
         <button
           onClick={exportCSV}
-          className="bg-gray-200 dark:bg-[#1e293b] text-black dark:text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:scale-105 transition"
+          className="bg-gray-200 dark:bg-[#1e293b] px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <Download size={16} />
           Export
         </button>
+
       </div>
     </div>
   );
