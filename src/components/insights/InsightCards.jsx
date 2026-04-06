@@ -4,7 +4,6 @@ import { useFinance } from "../../hooks/useFinance";
 export default function InsightCards() {
   const { transactions } = useFinance();
 
-  // 🔥 CATEGORY DATA (expense only)
   const categoryMap = {};
   const countMap = {};
   let totalExpense = 0;
@@ -27,28 +26,22 @@ export default function InsightCards() {
     count: countMap[key],
   }));
 
-  // 🔥 TOP CATEGORY
   const top =
     [...data].sort((a, b) => b.value - a.value)[0] || {};
 
-  // 🔥 MOST TRANSACTIONS
   const most =
     [...data].sort((a, b) => b.count - a.count)[0] || {};
 
-  // 🔥 AVG MONTHLY
   const months = new Set(
     transactions.map((t) => t.date?.split("/")[1])
   );
 
-  const avg =
-    totalExpense / (months.size || 1);
+  const avg = totalExpense / (months.size || 1);
 
-  // 🔥 INCOME
   const totalIncome = transactions
     .filter((t) => t.type === "income")
     .reduce((a, b) => a + b.amount, 0);
 
-  // 🔥 SAVINGS
   const savings =
     totalIncome === 0
       ? 0
@@ -82,28 +75,30 @@ export default function InsightCards() {
   ];
 
   return (
-    <div className="grid md:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {cards.map((card, i) => (
         <div
           key={i}
-          className="bg-[#0f172a] p-5 rounded-xl flex justify-between items-center hover:scale-[1.02] transition"
+          className="bg-white dark:bg-[#0f172a] p-4 rounded-xl flex flex-col justify-between min-w-0 h-full hover:scale-[1.02] transition"
         >
-          <div>
-            <p className="text-sm text-gray-400">
-              {card.title}
-            </p>
+          <div className="flex justify-between items-start gap-3">
+            <div className="min-w-0">
+              <p className="text-xs text-gray-500 break-words">
+                {card.title}
+              </p>
 
-            <h2 className="text-lg font-bold">
-              {card.value}
-            </h2>
+              <h2 className="text-base font-semibold break-words">
+                {card.value}
+              </h2>
 
-            <p className="text-xs text-gray-400">
-              {card.sub}
-            </p>
-          </div>
+              <p className="text-xs text-gray-400 break-words">
+                {card.sub}
+              </p>
+            </div>
 
-          <div className="text-purple-400">
-            {card.icon}
+            <div className="text-purple-500 shrink-0">
+              {card.icon}
+            </div>
           </div>
         </div>
       ))}
