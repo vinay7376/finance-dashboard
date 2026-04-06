@@ -13,8 +13,7 @@ export default function Sidebar() {
     }`;
 
   return (
-    <div className="w-64 h-screen bg-white dark:bg-[#0f172a] p-6 fixed flex flex-col justify-between transition">
-
+    <div className="w-64 h-screen bg-white dark:bg-[#0f172a] p-6 fixed flex flex-col justify-between transition transform -translate-x-full md:translate-x-0 z-50">
       {/* TOP */}
       <div>
         <h1 className="text-xl font-bold mb-10 text-black dark:text-white">
