@@ -21,8 +21,6 @@ const balance = income - expense;
 return (
 <div className="p-6 max-w-7xl mx-auto space-y-6">
 
-
-
   {/* METRICS */}  
   <MetricCards  
     balance={balance}  

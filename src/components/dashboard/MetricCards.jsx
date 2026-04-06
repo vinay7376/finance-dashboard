@@ -44,13 +44,13 @@ export default function MetricCards({ balance, income, expense, count }) {
               {c.title}
             </p>
 
-            {/* 🔥 TEXT ANIMATION */}
+            {/* TEXT ANIMATION */}
             <h2 className={`text-xl font-bold mt-1 ${c.color} transition-transform duration-300 group-hover:translate-x-1`}>
               {c.value}
             </h2>
           </div>
 
-          {/* 🔥 ICON ANIMATION */}
+          {/* ICON ANIMATION */}
           <div
             className={`p-3 rounded-lg ${c.bg} ${c.color} transition-transform duration-300 group-hover:scale-110`}
           >

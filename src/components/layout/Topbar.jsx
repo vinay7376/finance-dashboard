@@ -58,49 +58,58 @@ export default function Topbar({ setIsOpen }) {
   };
 
   return (
-    <div className="flex justify-between items-center mb-6">
+    <div className="sticky top-0 z-40 backdrop-blur-xl bg-white/70 dark:bg-[#020617]/70 border-b border-gray-200 dark:border-gray-800 mb-6 px-4 py-3 rounded-xl">
 
-      {/* LEFT */}
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => setIsOpen(true)}
-          className="md:hidden text-2xl"
-        >
-          ☰
-        </button>
+      {/* CONTAINER */}
+      <div className="flex justify-between items-center">
 
-        <h1 className="text-xl font-semibold tracking-wide text-black dark:text-white">
-          {getTitle()}
-        </h1>
-      </div>
+        {/* LEFT */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsOpen(true)}
+            className="md:hidden text-2xl hover:scale-110 transition"
+          >
+            ☰
+          </button>
 
-      {/* RIGHT */}
-      <div className="flex items-center gap-4">
+          <h1 className="text-xl font-semibold tracking-wide text-gray-900 dark:text-white">
+            {getTitle()}
+          </h1>
+        </div>
 
-        <select
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          className="bg-white dark:bg-[#0f172a] px-3 py-2 rounded-lg border text-sm"
-        >
-          <option value="admin">Admin</option>
-          <option value="viewer">Viewer</option>
-        </select>
+        {/* RIGHT */}
+        <div className="flex items-center gap-3">
 
-        <button
-          onClick={() => setDark(!dark)}
-          className="p-2 rounded-lg bg-white dark:bg-[#0f172a]"
-        >
-          {dark ? <Sun size={18} /> : <Moon size={18} />}
-        </button>
+          {/* ROLE SELECT */}
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm focus:outline-none"
+          >
+            <option value="admin">Admin</option>
+            <option value="viewer">Viewer</option>
+          </select>
 
-        <button
-          onClick={exportCSV}
-          className="bg-gray-200 dark:bg-[#1e293b] px-4 py-2 rounded-lg flex items-center gap-2"
-        >
-          <Download size={16} />
-          Export
-        </button>
+          {/* THEME TOGGLE */}
+          <button
+            onClick={() => setDark(!dark)}
+            className="p-2 rounded-lg bg-white/80 dark:bg-[#0f172a]/80 hover:scale-110 transition shadow-sm"
+          >
+            {dark ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
 
+          {/* EXPORT BUTTON */}
+          <button
+            onClick={exportCSV}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+            bg-gradient-to-r from-purple-500 to-indigo-500 text-white
+            hover:scale-105 transition shadow-md"
+          >
+            <Download size={16} />
+            Export
+          </button>
+
+        </div>
       </div>
     </div>
   );

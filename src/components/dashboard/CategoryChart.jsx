@@ -5,10 +5,12 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useState } from "react";
 import { useFinance } from "../../hooks/useFinance";
 
 export default function CategoryChart() {
   const { transactions } = useFinance();
+  const [activeIndex, setActiveIndex] = useState(null);
 
   const categoryMap = {};
   let total = 0;
@@ -27,18 +29,36 @@ export default function CategoryChart() {
   }));
 
   const COLORS = [
-    "#ec4899",
-    "#f97316",
-    "#eab308",
-    "#ef4444",
-    "#3b82f6",
-    "#8b5cf6",
+    ["#ec4899", "#f472b6"], // pink gradient
+    ["#f97316", "#fb923c"], // orange
+    ["#eab308", "#facc15"], // yellow
+    ["#ef4444", "#f87171"], // red
+    ["#3b82f6", "#60a5fa"], // blue
+    ["#8b5cf6", "#a78bfa"], // purple
   ];
 
-  return (
-    <div className="card flex flex-col h-full justify-between">
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const item = payload[0];
+      return (
+        <div className="bg-white dark:bg-gray-900 shadow-lg px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700">
+          <p className="text-sm font-medium text-gray-800 dark:text-white">
+            {item.name}
+          </p>
+          <p className="text-sm text-gray-500">
+            ₹{item.value.toLocaleString()}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
 
-      <h2 className="text-lg font-semibold">
+  return (
+    <div className="card flex flex-col h-full justify-between p-4">
+      
+      {/* Title */}
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
         Spending Category
       </h2>
 
@@ -48,40 +68,77 @@ export default function CategoryChart() {
         </div>
       ) : (
         <>
-          <div className="flex justify-center items-center flex-1">
-            <ResponsiveContainer width={250} height={250}>
+          {/* Chart */}
+          <div className="flex justify-center items-center flex-1 min-h-[260px]">
+            <ResponsiveContainer width="100%" height="100%">
               <PieChart>
+                
+                {/* Gradients */}
+                <defs>
+                  {COLORS.map((color, i) => (
+                    <linearGradient
+                      key={i}
+                      id={`grad-${i}`}
+                      x1="0"
+                      y1="0"
+                      x2="1"
+                      y2="1"
+                    >
+                      <stop offset="0%" stopColor={color[0]} />
+                      <stop offset="100%" stopColor={color[1]} />
+                    </linearGradient>
+                  ))}
+                </defs>
+
                 <Pie
                   data={data}
-                  innerRadius={70}
-                  outerRadius={95}
+                  innerRadius={75}
+                  outerRadius={100}
                   dataKey="value"
-                  paddingAngle={2}
+                  paddingAngle={3}
+                  stroke="none"
+                  isAnimationActive={true}
+                  animationDuration={800}
+                  onMouseEnter={(_, index) => setActiveIndex(index)}
+                  onMouseLeave={() => setActiveIndex(null)}
                 >
                   {data.map((_, i) => (
                     <Cell
                       key={i}
-                      fill={COLORS[i % COLORS.length]}
+                      fill={`url(#grad-${i})`}
+                      style={{
+                        transform:
+                          activeIndex === i
+                            ? "scale(1.05)"
+                            : "scale(1)",
+                        transformOrigin: "center",
+                        transition: "all 0.3s ease",
+                      }}
                     />
                   ))}
                 </Pie>
 
+                {/* Center Text */}
                 <text
                   x="50%"
                   y="50%"
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className="fill-white"
-                  style={{ fontSize: "16px", fontWeight: "600" }}
+                  className="fill-gray-900 dark:fill-white"
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: "700",
+                  }}
                 >
                   ₹{total.toLocaleString()}
                 </text>
 
-                <Tooltip />
+                <Tooltip content={<CustomTooltip />} />
               </PieChart>
             </ResponsiveContainer>
           </div>
 
+          {/* Legend */}
           <div className="space-y-2 text-sm mt-2">
             {data.map((item, i) => {
               const percent =
@@ -96,17 +153,16 @@ export default function CategoryChart() {
                     <span
                       className="w-2.5 h-2.5 rounded-full"
                       style={{
-                        background:
-                          COLORS[i % COLORS.length],
+                        background: COLORS[i][0],
                       }}
                     ></span>
 
-                    <span className="truncate text-gray-300">
+                    <span className="truncate text-gray-700 dark:text-gray-300">
                       {item.name}
                     </span>
                   </div>
 
-                  <span className="text-gray-400">
+                  <span className="text-gray-500 dark:text-gray-400">
                     {percent}%
                   </span>
                 </div>

@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 const FinanceContext = createContext();
 
 export function FinanceProvider({ children }) {
-  // 🔥 LOAD FROM LOCAL STORAGE
+
   const [transactions, setTransactions] = useState(() => {
     const saved = localStorage.getItem("transactions");
     return saved
@@ -34,7 +34,6 @@ export function FinanceProvider({ children }) {
   });
   const [role, setRole] = useState("admin");
 
-  // 🔥 SAVE TO LOCAL STORAGE
   useEffect(() => {
     localStorage.setItem("transactions", JSON.stringify(transactions));
   }, [transactions]);

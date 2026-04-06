@@ -54,59 +54,35 @@ export default function Insights() {
     <div className="space-y-6">
 
       {/* 🔥 CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[ 
-          {
-            title: "TOP SPENDING CATEGORY",
-            value: topCategory.name,
-            sub: `₹${topCategory.value || 0}`,
-          },
-          {
-            title: "MOST TRANSACTIONS IN",
-            value: mostTx.name,
-            sub: `${mostTx.count || 0} transactions`,
-          },
-          {
-            title: "AVG MONTHLY SPEND",
-            value: `₹${avg}`,
-            sub: "per active month",
-          },
-          {
-            title: "SAVINGS RATE",
-            value: `${savingsRate}%`,
-            sub: "Great!",
-          },
-        ].map((card, i) => (
-          <div
-            key={i}
-            className="
-            bg-white dark:bg-[#0f172a] 
-            p-4 rounded-xl min-w-0 h-full
+      <div className="grid grid-cols-4 gap-4 mb-6">
 
-            transition-all duration-300 ease-out
-            cursor-pointer will-change-transform
+        <div className="card">
+          <p className="text-gray-400 text-sm">TOP SPENDING CATEGORY</p>
+          <h2 className="text-lg font-semibold mt-2">{topCategory.name}</h2>
+          <p className="text-gray-400">₹{topCategory.value}</p>
+        </div>
 
-            hover:scale-[1.04] 
-            hover:-translate-y-2 
-            hover:shadow-2xl 
-            hover:shadow-purple-500/20
-            "
-          >
-            <p className="text-xs text-gray-500 break-words">
-              {card.title}
-            </p>
+        <div className="card">
+          <p className="text-gray-400 text-sm">MOST TRANSACTIONS IN</p>
+          <h2 className="text-lg font-semibold mt-2">{mostTx.name}</h2>
+          <p className="text-gray-400">{mostTx.count} transactions</p>
+        </div>
 
-            <h2 className="text-base font-semibold mt-1 break-words">
-              {card.value || "-"}
-            </h2>
+        <div className="card">
+          <p className="text-gray-400 text-sm">AVG MONTHLY SPEND</p>
+          <h2 className="text-lg font-semibold mt-2">₹{avg}</h2>
+          <p className="text-gray-400">per active month</p>
+        </div>
 
-            <p className="text-xs text-gray-400 break-words">
-              {card.sub}
-            </p>
-          </div>
-        ))}
+        <div className="card">
+          <p className="text-gray-400 text-sm">SAVINGS RATE</p>
+          <h2 className="text-lg font-semibold mt-2 text-green-400">
+            {savingsRate}%
+          </h2>
+          <p className="text-gray-400">Great!</p>
+        </div>
+
       </div>
-
       {/* 🔥 BAR CHART */}
       <div
         className="

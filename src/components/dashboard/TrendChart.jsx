@@ -9,9 +9,7 @@ import {
 } from "recharts";
 
 export default function TrendChart({ transactions }) {
-
-  const months = ["Jan","Feb","Mar","Apr","May","Jun",
-                  "Jul","Aug","Sep","Oct","Nov","Dec"];
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
   const monthly = months.map((m) => ({
     name: m,
@@ -49,7 +47,7 @@ export default function TrendChart({ transactions }) {
         Balance Trend
       </h2>
 
-      {/* 🔥 FIXED HEIGHT CHART AREA */}
+      {/* FIXED HEIGHT CHART AREA */}
       <div className="flex-1 min-h-[250px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
