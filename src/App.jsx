@@ -7,16 +7,22 @@ import Transactions from "./pages/Transactions";
 import Insights from "./pages/Insights";
 
 export default function App() {
-  const [isOpen, setIsOpen] = useState(false); // ✅ ADD THIS
+  const [isOpen, setIsOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <BrowserRouter>
       <div className="flex min-h-screen bg-white dark:bg-[#020617] text-black dark:text-white transition-colors duration-300">
 
-        <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+        <Sidebar 
+          isOpen={isOpen} 
+          setIsOpen={setIsOpen} 
+          collapsed={collapsed} 
+          setCollapsed={setCollapsed} 
+        />
 
         <div className="flex-1 p-4 md:ml-64">
-          <Topbar setIsOpen={setIsOpen} /> {/* ✅ FIXED */}
+          <Topbar setIsOpen={setIsOpen} />
           
           <Routes>
             <Route path="/" element={<Dashboard />} />
