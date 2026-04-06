@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/layout/Sidebar";
 import Dashboard from "./pages/Dashboard";
@@ -9,8 +10,10 @@ export default function App() {
     <BrowserRouter>
       <div className="flex min-h-screen bg-white dark:bg-[#020617] text-black dark:text-white transition-colors duration-300">
 
-        <Sidebar />
-        <div className="flex-1 p-4 md:ml-64">
+       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+
+<div className="flex-1 p-4 md:ml-64">
+  <Topbar setIsOpen={setIsOpen} />
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/transactions" element={<Transactions />} />
