@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Topbar from "../components/layout/Topbar";
 import { useFinance } from "../hooks/useFinance";
 import TransactionModal from "../components/transactions/TransactionModal";
 
@@ -60,7 +59,6 @@ const paginated = filtered.slice((page - 1) * limit, page * limit);
 
 return (
 <div>
-<Topbar />
 
 {/* HEADER */}  
   <div className="flex justify-end items-center mb-6">  
