@@ -55,7 +55,6 @@ export default function Insights() {
 
       {/* 🔥 CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-
         {[ 
           {
             title: "TOP SPENDING CATEGORY",
@@ -80,7 +79,18 @@ export default function Insights() {
         ].map((card, i) => (
           <div
             key={i}
-            className="bg-white dark:bg-[#0f172a] p-4 rounded-xl min-w-0 h-full"
+            className="
+            bg-white dark:bg-[#0f172a] 
+            p-4 rounded-xl min-w-0 h-full
+
+            transition-all duration-300 ease-out
+            cursor-pointer will-change-transform
+
+            hover:scale-[1.04] 
+            hover:-translate-y-2 
+            hover:shadow-2xl 
+            hover:shadow-purple-500/20
+            "
           >
             <p className="text-xs text-gray-500 break-words">
               {card.title}
@@ -95,11 +105,18 @@ export default function Insights() {
             </p>
           </div>
         ))}
-
       </div>
 
       {/* 🔥 BAR CHART */}
-      <div className="bg-white dark:bg-[#0f172a] p-4 rounded-xl">
+      <div
+        className="
+        bg-white dark:bg-[#0f172a] 
+        p-4 rounded-xl
+
+        transition-all duration-300 ease-out
+        hover:shadow-xl hover:-translate-y-1
+        "
+      >
         <h2 className="mb-4">Income vs Expense Over Time</h2>
 
         <ResponsiveContainer width="100%" height={300}>
@@ -114,11 +131,18 @@ export default function Insights() {
       </div>
 
       {/* 🔥 CATEGORY TABLE */}
-      <div className="bg-white dark:bg-[#0f172a] p-4 rounded-xl overflow-x-auto">
+      <div
+        className="
+        bg-white dark:bg-[#0f172a] 
+        p-4 rounded-xl overflow-x-auto
+
+        transition-all duration-300 ease-out
+        hover:shadow-xl hover:-translate-y-1
+        "
+      >
         <h2 className="mb-4">Category Breakdown</h2>
 
         <div className="min-w-[600px]">
-
           <div className="grid grid-cols-5 text-gray-400 text-sm border-b pb-2">
             <span>Category</span>
             <span>Amount</span>
@@ -133,7 +157,7 @@ export default function Insights() {
             return (
               <div
                 key={i}
-                className="grid grid-cols-5 py-3 items-center border-b"
+                className="grid grid-cols-5 py-3 items-center border-b hover:bg-gray-100 dark:hover:bg-[#020617] transition"
               >
                 <span className="flex items-center gap-2 break-words">
                   <span className="w-2 h-2 rounded-full bg-pink-500"></span>
@@ -153,9 +177,9 @@ export default function Insights() {
               </div>
             );
           })}
-
         </div>
       </div>
+
     </div>
   );
 }
