@@ -1,4 +1,4 @@
-import Topbar from "../components/layout/Topbar";
+
 import MetricCards from "../components/dashboard/MetricCards";
 import TrendChart from "../components/dashboard/TrendChart";
 import CategoryChart from "../components/dashboard/CategoryChart";
@@ -21,8 +21,7 @@ const balance = income - expense;
 return (
 <div className="p-6 max-w-7xl mx-auto space-y-6">
 
-{/* TOPBAR */}  
-  <Topbar />  
+
 
   {/* METRICS */}  
   <MetricCards  
