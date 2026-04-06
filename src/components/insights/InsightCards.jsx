@@ -79,7 +79,20 @@ export default function InsightCards() {
       {cards.map((card, i) => (
         <div
           key={i}
-          className="bg-white dark:bg-[#0f172a] p-4 rounded-xl flex flex-col justify-between min-w-0 h-full hover:scale-[1.02] transition"
+          className="
+          bg-white dark:bg-[#0f172a] 
+          p-4 rounded-xl 
+          flex flex-col justify-between 
+          min-w-0 h-full
+
+          transition-all duration-300 ease-out
+          cursor-pointer will-change-transform
+
+          hover:scale-[1.04] 
+          hover:-translate-y-2 
+          hover:shadow-2xl 
+          hover:shadow-purple-500/20
+          "
         >
           <div className="flex justify-between items-start gap-3">
             <div className="min-w-0">
@@ -96,7 +109,7 @@ export default function InsightCards() {
               </p>
             </div>
 
-            <div className="text-purple-500 shrink-0">
+            <div className="text-purple-500 shrink-0 transition-transform duration-300 group-hover:scale-110">
               {card.icon}
             </div>
           </div>
