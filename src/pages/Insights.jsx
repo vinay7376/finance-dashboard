@@ -1,4 +1,4 @@
-import Topbar from "../components/layout/Topbar";
+
 import { useFinance } from "../hooks/useFinance";
 import {
   BarChart,
@@ -56,7 +56,7 @@ export default function Insights() {
 
   return (
     <div>
-      <Topbar />
+     
 
       {/* ✅ FIX: hidden added (no deletion) */}
       <h1 className="hidden text-2xl font-bold mb-6">Insights</h1>
