@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Topbar from "../components/layout/Topbar";
 import { useFinance } from "../hooks/useFinance";
 import TransactionModal from "../components/transactions/TransactionModal";
 
@@ -58,13 +57,10 @@ export default function Transactions() {
   const paginated = filtered.slice((page - 1) * limit, page * limit);
 
   return (
-    <div>
-      <Topbar />
+    <div className="p-6">
 
       {/* HEADER */}
       <div className="flex justify-end items-center mb-6">
-        <h1 className="hidden text-2xl font-bold">Transactions</h1>
-
         {role === "admin" && (
           <button
             onClick={() => {
@@ -82,7 +78,7 @@ export default function Transactions() {
       <div className="flex flex-wrap gap-3 mb-4 items-center">
         <input
           placeholder="Search transactions..."
-          className="bg-white dark:bg-[#0f172a] text-black dark:text-white px-4 py-2 rounded-lg w-64 outline-none border border-gray-300 dark:border-gray-700"
+          className="bg-white dark:bg-[#0f172a] px-4 py-2 rounded-lg w-64 border border-gray-300 dark:border-gray-700"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -94,7 +90,7 @@ export default function Transactions() {
             className={`px-4 py-2 rounded-lg text-sm ${
               filter === t
                 ? "bg-purple-600 text-white"
-                : "bg-gray-200 dark:bg-[#0f172a] text-black dark:text-gray-400"
+                : "bg-gray-200 dark:bg-[#0f172a]"
             }`}
           >
             {t}
@@ -102,7 +98,7 @@ export default function Transactions() {
         ))}
 
         <select
-          className="bg-gray-200 dark:bg-[#0f172a] text-black dark:text-white px-3 py-2 rounded-lg"
+          className="bg-gray-200 dark:bg-[#0f172a] px-3 py-2 rounded-lg"
           onChange={(e) => setCategory(e.target.value)}
         >
           <option value="all">All Categories</option>
@@ -110,87 +106,19 @@ export default function Transactions() {
             <option key={c}>{c}</option>
           ))}
         </select>
-
-        <input
-          type="date"
-          onChange={(e) => setFromDate(e.target.value)}
-          className="bg-gray-200 dark:bg-[#0f172a] text-black dark:text-white px-3 py-2 rounded-lg"
-        />
-
-        <input
-          type="date"
-          onChange={(e) => setToDate(e.target.value)}
-          className="bg-gray-200 dark:bg-[#0f172a] text-black dark:text-white px-3 py-2 rounded-lg"
-        />
-
-        <select
-          className="bg-gray-200 dark:bg-[#0f172a] text-black dark:text-white px-3 py-2 rounded-lg"
-          onChange={(e) => setSort(e.target.value)}
-        >
-          <option value="desc">Desc</option>
-          <option value="asc">Asc</option>
-        </select>
       </div>
 
       {/* TABLE */}
-      <div className="bg-white dark:bg-[#0f172a] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">
-        <div className="grid grid-cols-[1fr_2fr_1.5fr_1fr_1fr_1fr] p-4 text-gray-600 dark:text-gray-400 text-xs border-b border-gray-200 dark:border-gray-700 uppercase">
-          <span>Date</span>
-          <span>Description</span>
-          <span>Category</span>
-          <span>Type</span>
-          <span className="text-right">Amount</span>
-          <span className="text-right">Actions</span>
-        </div>
-
-        {paginated.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
-            No transactions found 🚫
+      <div className="bg-white dark:bg-[#0f172a] rounded-xl overflow-hidden border">
+        {paginated.map((t, i) => (
+          <div
+            key={i}
+            className="flex justify-between p-4 border-b items-center"
+          >
+            <span>{t.title}</span>
+            <span>{t.type === "income" ? "+" : "-"}₹{t.amount}</span>
           </div>
-        ) : (
-          paginated.map((t, i) => (
-            <div
-              key={i}
-              className="grid grid-cols-[1fr_2fr_1.5fr_1fr_1fr_1fr] p-4 border-b border-gray-200 dark:border-gray-800 items-center hover:bg-gray-100 dark:hover:bg-[#020617] transition"
-            >
-              <span className="text-gray-700 dark:text-gray-300">{t.date}</span>
-              <span className="font-medium">{t.title}</span>
-
-              <span
-                className={`inline-block px-3 py-1 text-xs rounded-full w-fit ${
-                  categoryColors[t.category] || "bg-gray-200 text-gray-700"
-                }`}
-              >
-                {t.category}
-              </span>
-
-              <span
-                className={`px-2 py-1 rounded-full text-xs w-fit ${
-                  t.type === "income"
-                    ? "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400"
-                    : "bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400"
-                }`}
-              >
-                {t.type}
-              </span>
-
-              <span
-                className={`text-right font-semibold ${
-                  t.type === "income"
-                    ? "text-green-600 dark:text-green-400"
-                    : "text-red-600 dark:text-red-400"
-                }`}
-              >
-                {t.type === "income" ? "+" : "-"}₹{t.amount.toLocaleString()}
-              </span>
-
-              <div className="flex justify-end gap-3 text-gray-500">
-                <button className="hover:text-blue-500">✏️</button>
-                <button className="hover:text-red-500">🗑️</button>
-              </div>
-            </div>
-          ))
-        )}
+        ))}
       </div>
 
       {/* PAGINATION */}
@@ -202,7 +130,7 @@ export default function Transactions() {
             className={`px-3 py-1 rounded ${
               page === i + 1
                 ? "bg-purple-600 text-white"
-                : "bg-gray-200 dark:bg-gray-700"
+                : "bg-gray-200"
             }`}
           >
             {i + 1}
@@ -227,7 +155,6 @@ export default function Transactions() {
                 date: new Date().toLocaleDateString("en-GB"),
               });
             }
-
             setShowModal(false);
             setEditIndex(null);
           }}
