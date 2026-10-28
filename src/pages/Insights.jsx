@@ -1,4 +1,6 @@
 import { useFinance } from "../hooks/useFinance";
+import InsightCards from "../components/insights/InsightCards";
+import { useMemo } from "react";
 import {
   BarChart,
   Bar,
@@ -6,156 +8,132 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  CartesianGrid,
 } from "recharts";
 
 export default function Insights() {
-  const { transactions } = useFinance();
+  const { analytics } = useFinance();
+  const { monthlyTrend, categoryExpenseMap, categoryCountMap, expense } = analytics;
 
-  const categoryMap = {};
-  const countMap = {};
+  const totalExpense = expense || 1;
 
-  transactions.forEach((t) => {
-    if (!categoryMap[t.category]) {
-      categoryMap[t.category] = 0;
-      countMap[t.category] = 0;
-    }
-    categoryMap[t.category] += t.amount;
-    countMap[t.category] += 1;
-  });
-
-  const data = Object.keys(categoryMap).map((key) => ({
-    name: key,
-    value: categoryMap[key],
-    count: countMap[key],
-  }));
-
-  const total = transactions.reduce((a, t) => a + t.amount, 0);
-
-  const topCategory =
-    [...data].sort((a, b) => b.value - a.value)[0] || {};
-
-  const mostTx =
-    [...data].sort((a, b) => b.count - a.count)[0] || {};
-
-  const avg = Math.floor(total / (transactions.length || 1));
-
-  const savingsRate = Math.floor(Math.random() * 100);
-
-  const monthly = [
-    { name: "Oct 2025", income: 60000, expense: 2000 },
-    { name: "Nov 2025", income: 80000, expense: 3000 },
-    { name: "Dec 2025", income: 70000, expense: 11500 },
-    { name: "Jan 2026", income: 82000, expense: 2000 },
-    { name: "Feb 2026", income: 70000, expense: 2500 },
-    { name: "Mar 2026", income: 95000, expense: 1800 },
-  ];
+  const categoryBreakdown = useMemo(() => {
+    return Object.keys(categoryExpenseMap || {})
+      .map((name) => {
+        const value = categoryExpenseMap[name];
+        const count = categoryCountMap[name] || 0;
+        const percent = Number(((value / totalExpense) * 100).toFixed(1));
+        return {
+          name,
+          value,
+          count,
+          percent,
+        };
+      })
+      .sort((a, b) => b.value - a.value);
+  }, [categoryExpenseMap, categoryCountMap, totalExpense]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-12">
+      {/* 1. Top 4 Metric Cards */}
+      <InsightCards />
 
-      {/*  CARDS */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      {/* 2. Income vs Expense Bar Chart */}
+      <div className="card">
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+          Income vs Expense Over Time
+        </h2>
 
-        <div className="card">
-          <p className="text-gray-400 text-sm">TOP SPENDING CATEGORY</p>
-          <h2 className="text-lg font-semibold mt-2">{topCategory.name}</h2>
-          <p className="text-gray-400">₹{topCategory.value}</p>
+        <div className="w-full h-[300px]">
+          {monthlyTrend.length === 0 ? (
+            <div className="h-full flex items-center justify-center text-xs text-slate-400">
+              No historical data available
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={monthlyTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" opacity={0.6} />
+                <XAxis dataKey="name" stroke="#64748b" fontSize={12} tickLine={false} />
+                <YAxis
+                  stroke="#64748b"
+                  fontSize={12}
+                  tickLine={false}
+                  tickFormatter={(val) => (val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val)}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#070d1e",
+                    border: "1px solid #1e293b",
+                    borderRadius: "10px",
+                    color: "#fff",
+                    fontSize: "12px",
+                  }}
+                  formatter={(val, name) => [
+                    `₹${Number(val).toLocaleString()}`,
+                    name === "expense" ? "Expense" : "Income",
+                  ]}
+                />
+                <Bar dataKey="expense" fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={45} />
+                <Bar dataKey="income" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={45} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
-
-        <div className="card">
-          <p className="text-gray-400 text-sm">MOST TRANSACTIONS IN</p>
-          <h2 className="text-lg font-semibold mt-2">{mostTx.name}</h2>
-          <p className="text-gray-400">{mostTx.count} transactions</p>
-        </div>
-
-        <div className="card">
-          <p className="text-gray-400 text-sm">AVG MONTHLY SPEND</p>
-          <h2 className="text-lg font-semibold mt-2">₹{avg}</h2>
-          <p className="text-gray-400">per active month</p>
-        </div>
-
-        <div className="card">
-          <p className="text-gray-400 text-sm">SAVINGS RATE</p>
-          <h2 className="text-lg font-semibold mt-2 text-green-400">
-            {savingsRate}%
-          </h2>
-          <p className="text-gray-400">Great!</p>
-        </div>
-
-      </div>
-      {/* BAR CHART */}
-      <div
-        className="
-        bg-white dark:bg-[#0f172a] 
-        p-4 rounded-xl
-
-        transition-all duration-300 ease-out
-        hover:shadow-xl hover:-translate-y-1
-        "
-      >
-        <h2 className="mb-4">Income vs Expense Over Time</h2>
-
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={monthly}>
-            <XAxis dataKey="name" stroke="#94a3b8" />
-            <YAxis stroke="#94a3b8" />
-            <Tooltip />
-            <Bar dataKey="expense" fill="#ef4444" />
-            <Bar dataKey="income" fill="#10b981" />
-          </BarChart>
-        </ResponsiveContainer>
       </div>
 
-      {/* CATEGORY TABLE */}
-      <div
-        className="
-        bg-white dark:bg-[#0f172a] 
-        p-4 rounded-xl overflow-x-auto
-
-        transition-all duration-300 ease-out
-        hover:shadow-xl hover:-translate-y-1
-        "
-      >
-        <h2 className="mb-4">Category Breakdown</h2>
+      {/* 3. Category Breakdown Table */}
+      <div className="card overflow-x-auto">
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+          Category Breakdown
+        </h2>
 
         <div className="min-w-[600px]">
-          <div className="grid grid-cols-5 text-gray-400 text-sm border-b pb-2">
+          <div className="grid grid-cols-5 text-slate-400 text-xs font-semibold border-b border-slate-200 dark:border-slate-800 pb-3">
             <span>Category</span>
             <span>Amount</span>
-            <span>%</span>
-            <span>Count</span>
+            <span>% of Total</span>
+            <span>Tx Count</span>
             <span>Bar</span>
           </div>
 
-          {data.map((c, i) => {
-            const percent = ((c.value / total) * 100).toFixed(1);
+          <div className="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs">
+            {categoryBreakdown.length === 0 ? (
+              <p className="py-6 text-center text-slate-400">No expense records found</p>
+            ) : (
+              categoryBreakdown.map((c, i) => (
+                <div
+                  key={i}
+                  className="grid grid-cols-5 py-3.5 items-center hover:bg-slate-50 dark:hover:bg-slate-800/30 transition px-1 rounded-lg"
+                >
+                  <span className="flex items-center gap-2 font-medium text-slate-900 dark:text-white">
+                    <span className="w-2 h-2 rounded-full bg-pink-500 shrink-0" />
+                    <span className="truncate">{c.name}</span>
+                  </span>
 
-            return (
-              <div
-                key={i}
-                className="grid grid-cols-5 py-3 items-center border-b hover:bg-gray-100 dark:hover:bg-[#020617] transition"
-              >
-                <span className="flex items-center gap-2 break-words">
-                  <span className="w-2 h-2 rounded-full bg-pink-500"></span>
-                  {c.name}
-                </span>
+                  <span className="font-mono text-slate-900 dark:text-white font-semibold">
+                    ₹{c.value.toLocaleString()}
+                  </span>
 
-                <span>₹{c.value}</span>
-                <span>{percent}%</span>
-                <span>{c.count}</span>
+                  <span className="text-slate-400 font-mono">
+                    {c.percent}%
+                  </span>
 
-                <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded">
-                  <div
-                    className="bg-pink-500 h-2 rounded"
-                    style={{ width: `${percent}%` }}
-                  />
+                  <span className="text-slate-400">
+                    {c.count}
+                  </span>
+
+                  <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                    <div
+                      className="bg-pink-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min(100, c.percent)}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              ))
+            )}
+          </div>
         </div>
       </div>
-
     </div>
   );
 }

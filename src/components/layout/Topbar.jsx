@@ -1,19 +1,22 @@
-import { Sun, Moon, Download } from "lucide-react";
+import { Sun, Moon, Download, Menu } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useFinance } from "../../hooks/useFinance";
 import { useLocation } from "react-router-dom";
 
 export default function Topbar({ setIsOpen }) {
-  const { transactions, role, setRole } = useFinance();
+  const { role, setRole, handleExportCSV } = useFinance();
   const location = useLocation();
 
   const [dark, setDark] = useState(() => {
-    return localStorage.getItem("theme") === "dark";
+    return (
+      localStorage.getItem("theme") === "dark" ||
+      (!localStorage.getItem("theme") &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches)
+    );
   });
 
   useEffect(() => {
     const root = document.documentElement;
-
     if (dark) {
       root.classList.add("dark");
       localStorage.setItem("theme", "dark");
@@ -22,27 +25,6 @@ export default function Topbar({ setIsOpen }) {
       localStorage.setItem("theme", "light");
     }
   }, [dark]);
-
-  const exportCSV = () => {
-    const headers = ["Date", "Title", "Category", "Type", "Amount"];
-
-    const rows = transactions.map((t) => [
-      t.date,
-      t.title,
-      t.category,
-      t.type,
-      t.amount,
-    ]);
-
-    let csvContent =
-      "data:text/csv;charset=utf-8," +
-      [headers, ...rows].map((e) => e.join(",")).join("\n");
-
-    const link = document.createElement("a");
-    link.href = encodeURI(csvContent);
-    link.download = "transactions.csv";
-    link.click();
-  };
 
   const getTitle = () => {
     switch (location.pathname) {
@@ -58,58 +40,50 @@ export default function Topbar({ setIsOpen }) {
   };
 
   return (
-    <div className="sticky top-0 z-40 backdrop-blur-xl bg-white/70 dark:bg-[#020617]/70 border-b border-gray-200 dark:border-gray-800 mb-6 px-4 py-3 rounded-xl">
+    <div className="flex justify-between items-center mb-6 py-2">
+      {/* Left: Mobile hamburger & Clean Title */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => setIsOpen(true)}
+          className="md:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+        >
+          <Menu size={22} />
+        </button>
 
-      {/* CONTAINER */}
-      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+          {getTitle()}
+        </h1>
+      </div>
 
-        {/* LEFT */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setIsOpen(true)}
-            className="md:hidden text-2xl hover:scale-110 transition"
-          >
-            ☰
-          </button>
+      {/* Right Controls: Role, Theme, Export */}
+      <div className="flex items-center gap-3">
+        {/* Role Select Dropdown */}
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          className="bg-white dark:bg-[#0b1329] text-slate-800 dark:text-slate-200 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold focus:outline-none cursor-pointer"
+        >
+          <option value="admin">Admin</option>
+          <option value="viewer">Viewer</option>
+        </select>
 
-          <h1 className="text-xl font-semibold tracking-wide text-gray-900 dark:text-white">
-            {getTitle()}
-          </h1>
-        </div>
+        {/* Theme Toggle Button */}
+        <button
+          onClick={() => setDark(!dark)}
+          className="p-2 rounded-xl bg-white dark:bg-[#0b1329] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition shadow-sm"
+          title="Toggle Theme"
+        >
+          {dark ? <Sun size={17} className="text-amber-400" /> : <Moon size={17} />}
+        </button>
 
-        {/* RIGHT */}
-        <div className="flex items-center gap-3">
-
-          {/* ROLE SELECT */}
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm focus:outline-none"
-          >
-            <option value="admin">Admin</option>
-            <option value="viewer">Viewer</option>
-          </select>
-
-          {/* THEME TOGGLE */}
-          <button
-            onClick={() => setDark(!dark)}
-            className="p-2 rounded-lg bg-white/80 dark:bg-[#0f172a]/80 hover:scale-110 transition shadow-sm"
-          >
-            {dark ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
-
-          {/* EXPORT BUTTON */}
-          <button
-            onClick={exportCSV}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-            bg-gradient-to-r from-purple-500 to-indigo-500 text-white
-            hover:scale-105 transition shadow-md"
-          >
-            <Download size={16} />
-            Export
-          </button>
-
-        </div>
+        {/* Export Button */}
+        <button
+          onClick={handleExportCSV}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-[#0b1329] border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:border-purple-500 transition shadow-sm"
+        >
+          <Download size={15} />
+          Export
+        </button>
       </div>
     </div>
   );

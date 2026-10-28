@@ -7,74 +7,88 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import { useFinance } from "../../hooks/useFinance";
 
-export default function TrendChart({ transactions }) {
-  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function parseMonthIndex(dateStr) {
+  if (!dateStr) return -1;
+  // Try direct Date object
+  const d = new Date(dateStr);
+  if (!isNaN(d.getTime())) {
+    return d.getMonth();
+  }
+  // Try DD/MM/YYYY
+  if (dateStr.includes("/")) {
+    const parts = dateStr.split("/");
+    if (parts.length >= 2) {
+      const m = Number(parts[1]) - 1;
+      if (m >= 0 && m <= 11) return m;
+    }
+  }
+  return -1;
+}
+
+export default function TrendChart() {
+  const { transactions } = useFinance();
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   const monthly = months.map((m) => ({
     name: m,
     income: 0,
     expense: 0,
+    value: 0,
   }));
 
   transactions.forEach((t) => {
-    if (!t.date) return;
-
-    const parts = t.date.split("/");
-    if (parts.length < 2) return;
-
-    const monthIndex = Number(parts[1]) - 1;
-
-    if (monthIndex < 0 || monthIndex > 11) return;
-
-    if (t.type === "income") {
-      monthly[monthIndex].income += Number(t.amount);
-    } else {
-      monthly[monthIndex].expense += Number(t.amount);
+    const mIdx = parseMonthIndex(t.date);
+    if (mIdx >= 0 && mIdx < 12) {
+      const amt = Number(t.amount) || 0;
+      if (t.type === "income") {
+        monthly[mIdx].income += amt;
+      } else {
+        monthly[mIdx].expense += amt;
+      }
     }
   });
 
-  const data = monthly.map((m) => ({
-    name: m.name,
-    value: m.income - m.expense,
-  }));
+  // Calculate cumulative or monthly net balance
+  monthly.forEach((m) => {
+    m.value = m.income - m.expense;
+  });
 
   return (
-    <div className="card flex flex-col h-full">
-
-      {/* TITLE */}
-      <h2 className="mb-4 text-lg font-semibold">
+    <div className="card flex flex-col h-full justify-between">
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
         Balance Trend
       </h2>
 
-      {/* FIXED HEIGHT CHART AREA */}
-      <div className="flex-1 min-h-[250px]">
+      <div className="w-full flex-1 min-h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
-
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="#1e293b"
+          <LineChart data={monthly} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" opacity={0.6} />
+            <XAxis dataKey="name" stroke="#64748b" fontSize={12} tickLine={false} />
+            <YAxis
+              stroke="#64748b"
+              fontSize={12}
+              tickLine={false}
+              tickFormatter={(val) => (val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val)}
             />
-
-            <XAxis dataKey="name" stroke="#94a3b8" />
-            <YAxis stroke="#94a3b8" />
-
             <Tooltip
               contentStyle={{
-                background: "#020617",
+                backgroundColor: "#070d1e",
                 border: "1px solid #1e293b",
-                borderRadius: "8px",
+                borderRadius: "12px",
+                color: "#fff",
+                fontSize: "12px",
               }}
+              formatter={(val) => [`₹${Number(val).toLocaleString()}`, "Net Balance"]}
             />
-
             <Line
               type="monotone"
               dataKey="value"
               stroke="#8b5cf6"
               strokeWidth={3}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
+              dot={{ r: 4, fill: "#8b5cf6", strokeWidth: 2, stroke: "#fff" }}
+              activeDot={{ r: 7, fill: "#a855f7" }}
             />
           </LineChart>
         </ResponsiveContainer>

@@ -1,63 +1,65 @@
 import { Wallet, TrendingUp, TrendingDown, Repeat } from "lucide-react";
+import { useFinance } from "../../hooks/useFinance";
 
-export default function MetricCards({ balance, income, expense, count }) {
+export default function MetricCards() {
+  const { analytics, transactions } = useFinance();
+  const { balance, income, expense } = analytics;
+
   const cards = [
     {
       title: "Current Balance",
       value: `₹${balance.toLocaleString()}`,
-      icon: <Wallet size={20} />,
-      color: "text-green-500",
-      bg: "bg-green-100 dark:bg-green-500/20",
+      icon: Wallet,
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/10 text-emerald-500",
     },
     {
       title: "Total Income",
       value: `₹${income.toLocaleString()}`,
-      icon: <TrendingUp size={20} />,
-      color: "text-green-500",
-      bg: "bg-green-100 dark:bg-green-500/20",
+      icon: TrendingUp,
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/10 text-emerald-500",
     },
     {
       title: "Total Expenses",
       value: `₹${expense.toLocaleString()}`,
-      icon: <TrendingDown size={20} />,
-      color: "text-red-500",
-      bg: "bg-red-100 dark:bg-red-500/20",
+      icon: TrendingDown,
+      color: "text-rose-500",
+      bg: "bg-rose-500/10 text-rose-500",
     },
     {
       title: "Transactions",
-      value: count,
-      icon: <Repeat size={20} />,
+      value: transactions.length,
+      icon: Repeat,
       color: "text-blue-500",
-      bg: "bg-blue-100 dark:bg-blue-500/20",
+      bg: "bg-blue-500/10 text-blue-500",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-      {cards.map((c, i) => (
-        <div
-          key={i}
-          className="card flex justify-between items-center group"
-        >
-          <div>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">
-              {c.title}
-            </p>
-
-            {/* TEXT ANIMATION */}
-            <h2 className={`text-xl font-bold mt-1 ${c.color} transition-transform duration-300 group-hover:translate-x-1`}>
-              {c.value}
-            </h2>
-          </div>
-
-          {/* ICON ANIMATION */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {cards.map((c, i) => {
+        const Icon = c.icon;
+        return (
           <div
-            className={`p-3 rounded-lg ${c.bg} ${c.color} transition-transform duration-300 group-hover:scale-110`}
+            key={i}
+            className="card flex items-center justify-between p-5 hover:scale-[1.01] transition-transform duration-200"
           >
-            {c.icon}
+            <div>
+              <p className="text-slate-400 text-xs sm:text-sm font-medium">
+                {c.title}
+              </p>
+              <h2 className={`text-xl sm:text-2xl font-bold mt-1.5 ${c.color} font-mono`}>
+                {c.value}
+              </h2>
+            </div>
+
+            <div className={`p-3 rounded-xl ${c.bg}`}>
+              <Icon size={20} />
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

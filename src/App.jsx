@@ -12,25 +12,33 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="flex min-h-screen bg-white dark:bg-[#020617] text-black dark:text-white transition-colors duration-300">
-
-        <Sidebar 
-          isOpen={isOpen} 
-          setIsOpen={setIsOpen} 
-          collapsed={collapsed} 
-          setCollapsed={setCollapsed} 
+      <div className="min-h-screen bg-slate-50 dark:bg-[#030712] text-slate-900 dark:text-slate-100 transition-colors duration-200">
+        {/* Responsive Sidebar */}
+        <Sidebar
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
         />
 
-        <div className={`flex-1 p-4 transition-all duration-300 ${collapsed ? "md:ml-20" : "md:ml-64"}`}>
-          <Topbar setIsOpen={setIsOpen} />
-          
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/insights" element={<Insights />} />
-          </Routes>
-        </div>
+        {/* Main Content Area */}
+        <div
+          className={`min-h-screen flex flex-col transition-all duration-300 ease-in-out ${
+            collapsed ? "md:ml-20" : "md:ml-64"
+          }`}
+        >
+          <div className="p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto flex-1">
+            <Topbar setIsOpen={setIsOpen} />
 
+            <main>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/transactions" element={<Transactions />} />
+                <Route path="/insights" element={<Insights />} />
+              </Routes>
+            </main>
+          </div>
+        </div>
       </div>
     </BrowserRouter>
   );

@@ -1,118 +1,66 @@
-import { Crown, Hash, BarChart3, PiggyBank } from "lucide-react";
 import { useFinance } from "../../hooks/useFinance";
 
 export default function InsightCards() {
-  const { transactions } = useFinance();
+  const { analytics } = useFinance();
+  const { categoryExpenseMap, categoryCountMap, income, expense, monthlyTrend } = analytics;
 
-  const categoryMap = {};
-  const countMap = {};
-  let totalExpense = 0;
+  // 1. Top Spending Category
+  const topExpenseCategory = Object.keys(categoryExpenseMap || {})
+    .map((name) => ({ name, value: categoryExpenseMap[name] }))
+    .sort((a, b) => b.value - a.value)[0] || { name: "-", value: 0 };
 
-  transactions.forEach((t) => {
-    if (t.type === "expense") {
-      categoryMap[t.category] =
-        (categoryMap[t.category] || 0) + t.amount;
+  // 2. Most Frequent Category
+  const mostFrequentCategory = Object.keys(categoryCountMap || {})
+    .map((name) => ({ name, count: categoryCountMap[name] }))
+    .sort((a, b) => b.count - a.count)[0] || { name: "-", count: 0 };
 
-      countMap[t.category] =
-        (countMap[t.category] || 0) + 1;
+  // 3. Average Monthly Spend
+  const activeMonths = Math.max(1, (monthlyTrend || []).length);
+  const avgMonthlySpend = Math.round(expense / activeMonths);
 
-      totalExpense += t.amount;
-    }
-  });
-
-  const data = Object.keys(categoryMap).map((key) => ({
-    name: key,
-    value: categoryMap[key],
-    count: countMap[key],
-  }));
-
-  const top =
-    [...data].sort((a, b) => b.value - a.value)[0] || {};
-
-  const most =
-    [...data].sort((a, b) => b.count - a.count)[0] || {};
-
-  const months = new Set(
-    transactions.map((t) => t.date?.split("/")[1])
-  );
-
-  const avg = totalExpense / (months.size || 1);
-
-  const totalIncome = transactions
-    .filter((t) => t.type === "income")
-    .reduce((a, b) => a + b.amount, 0);
-
-  const savings =
-    totalIncome === 0
-      ? 0
-      : (((totalIncome - totalExpense) / totalIncome) * 100).toFixed(1);
+  // 4. Real Dynamic Savings Rate
+  const savingsRate = income > 0 ? Math.max(0, Math.round(((income - expense) / income) * 100)) : 0;
 
   const cards = [
     {
-      title: "Top Spending Category",
-      value: top.name || "-",
-      sub: `₹${top.value?.toLocaleString() || 0}`,
-      icon: <Crown />,
+      title: "TOP SPENDING CATEGORY",
+      value: topExpenseCategory.name,
+      sub: `₹${topExpenseCategory.value.toLocaleString()}`,
+      color: "text-slate-900 dark:text-white",
     },
     {
-      title: "Most Transactions",
-      value: most.name || "-",
-      sub: `${most.count || 0} transactions`,
-      icon: <Hash />,
+      title: "MOST TRANSACTIONS IN",
+      value: mostFrequentCategory.name,
+      sub: `${mostFrequentCategory.count} transactions`,
+      color: "text-slate-900 dark:text-white",
     },
     {
-      title: "Avg Monthly Spend",
-      value: `₹${Math.round(avg).toLocaleString()}`,
-      sub: "per month",
-      icon: <BarChart3 />,
+      title: "AVG MONTHLY SPEND",
+      value: `₹${avgMonthlySpend.toLocaleString()}`,
+      sub: "per active month",
+      color: "text-slate-900 dark:text-white",
     },
     {
-      title: "Savings Rate",
-      value: `${savings}%`,
-      sub: "Great!",
-      icon: <PiggyBank />,
+      title: "SAVINGS RATE",
+      value: `${savingsRate}%`,
+      sub: savingsRate >= 20 ? "Great!" : "Moderate",
+      color: "text-emerald-500",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {cards.map((card, i) => (
-        <div
-          key={i}
-          className="
-          bg-white dark:bg-[#0f172a] 
-          p-4 rounded-xl 
-          flex flex-col justify-between 
-          min-w-0 h-full
-
-          transition-all duration-300 ease-out
-          cursor-pointer will-change-transform
-
-          hover:scale-[1.04] 
-          hover:-translate-y-2 
-          hover:shadow-2xl 
-          hover:shadow-purple-500/20
-          "
-        >
-          <div className="flex justify-between items-start gap-3">
-            <div className="min-w-0">
-              <p className="text-xs text-gray-500 break-words">
-                {card.title}
-              </p>
-
-              <h2 className="text-base font-semibold break-words">
-                {card.value}
-              </h2>
-
-              <p className="text-xs text-gray-400 break-words">
-                {card.sub}
-              </p>
-            </div>
-
-            <div className="text-purple-500 shrink-0 transition-transform duration-300 group-hover:scale-110">
-              {card.icon}
-            </div>
-          </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {cards.map((c, i) => (
+        <div key={i} className="card p-5">
+          <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider">
+            {c.title}
+          </p>
+          <h2 className={`text-xl font-bold mt-2 truncate ${c.color}`}>
+            {c.value}
+          </h2>
+          <p className="text-slate-400 text-xs mt-1">
+            {c.sub}
+          </p>
         </div>
       ))}
     </div>

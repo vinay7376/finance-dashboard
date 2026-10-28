@@ -1,238 +1,344 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useFinance } from "../hooks/useFinance";
 import TransactionModal from "../components/transactions/TransactionModal";
-
-export default function Transactions() {
-const {
-transactions,
-addTransaction,
-deleteTransaction,
-updateTransaction,
-role,
-} = useFinance();
-
-const [filter, setFilter] = useState("all");
-const [search, setSearch] = useState("");
-const [category, setCategory] = useState("all");
-const [sort, setSort] = useState("desc");
-const [fromDate, setFromDate] = useState("");
-const [toDate, setToDate] = useState("");
-
-const [showModal, setShowModal] = useState(false);
-const [editIndex, setEditIndex] = useState(null);
-
-const [page, setPage] = useState(1);
-const limit = 5;
+import ConfirmModal from "../components/common/ConfirmModal";
+import { Pencil, Trash2 } from "lucide-react";
+import { formatDate } from "../utils/formatters";
 
 const categoryColors = {
-Food: "bg-orange-500/20 text-orange-500",
-Salary: "bg-green-500/20 text-green-500",
-Transport: "bg-blue-500/20 text-blue-500",
-Utilities: "bg-yellow-500/20 text-yellow-500",
-Healthcare: "bg-red-500/20 text-red-500",
-Freelance: "bg-purple-500/20 text-purple-500",
+  Food: "bg-orange-500/20 text-orange-400 border border-orange-500/30",
+  "Food & Dining": "bg-orange-500/20 text-orange-400 border border-orange-500/30",
+  Salary: "bg-green-500/20 text-green-400 border border-green-500/30",
+  Transport: "bg-blue-500/20 text-blue-400 border border-blue-500/30",
+  Transportation: "bg-blue-500/20 text-blue-400 border border-blue-500/30",
+  Utilities: "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30",
+  "Utilities & Bills": "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30",
+  Healthcare: "bg-rose-500/20 text-rose-400 border border-rose-500/30",
+  Freelance: "bg-purple-500/20 text-purple-400 border border-purple-500/30",
+  Shopping: "bg-pink-500/20 text-pink-400 border border-pink-500/30",
+  default: "bg-slate-500/20 text-slate-400 border border-slate-500/30",
 };
 
-let filtered = transactions.filter((t) => {
-const matchType = filter === "all" || t.type === filter;
+export default function Transactions() {
+  const {
+    transactions,
+    addTransaction,
+    updateTransaction,
+    deleteTransaction,
+    role,
+  } = useFinance();
 
-const matchSearch =  
-  t.title.toLowerCase().includes(search.toLowerCase()) ||  
-  t.category.toLowerCase().includes(search.toLowerCase());  
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all"); // "all" | "income" | "expense"
+  const [category, setCategory] = useState("all");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [sort, setSort] = useState("desc"); // "desc" | "asc"
 
-const matchCategory = category === "all" || t.category === category;  
+  const [page, setPage] = useState(1);
+  const limit = 8;
 
-const date = new Date(t.date.split(" ").reverse().join("-"));  
-const matchFrom = !fromDate || date >= new Date(fromDate);  
-const matchTo = !toDate || date <= new Date(toDate);  
+  const [showModal, setShowModal] = useState(false);
+  const [editItem, setEditItem] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
-return matchType && matchSearch && matchCategory && matchFrom && matchTo;
+  const canEdit = role === "admin";
 
-});
+  // Unique categories
+  const categoriesList = useMemo(() => {
+    return [...new Set(transactions.map((t) => t.category).filter(Boolean))];
+  }, [transactions]);
 
-filtered.sort((a, b) =>
-sort === "asc" ? a.amount - b.amount : b.amount - a.amount
-);
+  // Filtering
+  const filtered = useMemo(() => {
+    return transactions.filter((t) => {
+      // Type filter
+      if (filter !== "all" && t.type !== filter) return false;
 
-const totalPages = Math.ceil(filtered.length / limit);
-const paginated = filtered.slice((page - 1) * limit, page * limit);
+      // Search filter
+      if (search.trim()) {
+        const q = search.toLowerCase();
+        const matchTitle = (t.title || "").toLowerCase().includes(q);
+        const matchCat = (t.category || "").toLowerCase().includes(q);
+        if (!matchTitle && !matchCat) return false;
+      }
 
-return (
-<div>
+      // Category filter
+      if (category !== "all" && t.category !== category) return false;
 
-{/* HEADER */}  
-  <div className="flex justify-end items-center mb-6">  
-    <h1 className="hidden text-2xl font-bold">Transactions</h1>  
+      // Date range filter
+      if (fromDate && t.date && t.date < fromDate) return false;
+      if (toDate && t.date && t.date > toDate) return false;
 
-    {role === "admin" && (  
-      <button  
-        onClick={() => {  
-          setShowModal(true);  
-          setEditIndex(null);  
-        }}  
-        className="bg-purple-600 text-white px-4 py-2 rounded-lg shadow-sm hover:scale-105 hover:shadow-md transition"  
-      >  
-        + Add Transaction  
-      </button>  
-    )}  
-  </div>  
+      return true;
+    });
+  }, [transactions, filter, search, category, fromDate, toDate]);
 
-  {/* FILTER BAR */}  
-  <div className="flex flex-wrap gap-3 mb-4 items-center">  
-    <input  
-      placeholder="Search transactions..."  
-      className="bg-white dark:bg-[#0f172a] text-black dark:text-white px-4 py-2 rounded-lg w-64 outline-none border border-gray-300 dark:border-gray-700"  
-      value={search}  
-      onChange={(e) => setSearch(e.target.value)}  
-    />  
+  // Sorting
+  const sorted = useMemo(() => {
+    const list = [...filtered];
+    list.sort((a, b) => {
+      if (sort === "asc") return (a.amount || 0) - (b.amount || 0);
+      return (b.amount || 0) - (a.amount || 0);
+    });
+    return list;
+  }, [filtered, sort]);
 
-    {["all", "income", "expense"].map((t) => (  
-      <button  
-        key={t}  
-        onClick={() => setFilter(t)}  
-        className={`px-4 py-2 rounded-lg text-sm ${  
-          filter === t  
-            ? "bg-purple-600 text-white"  
-            : "bg-gray-200 dark:bg-[#0f172a] text-black dark:text-gray-400"  
-        }`}  
-      >  
-        {t}  
-      </button>  
-    ))}  
+  const totalPages = Math.max(1, Math.ceil(sorted.length / limit));
+  const currentPage = Math.min(page, totalPages);
+  const paginated = sorted.slice((currentPage - 1) * limit, currentPage * limit);
 
-    <select  
-      className="bg-gray-200 dark:bg-[#0f172a] text-black dark:text-white px-3 py-2 rounded-lg"  
-      onChange={(e) => setCategory(e.target.value)}  
-    >  
-      <option value="all">All Categories</option>  
-      {[...new Set(transactions.map((t) => t.category))].map((c) => (  
-        <option key={c}>{c}</option>  
-      ))}  
-    </select>  
+  return (
+    <div className="space-y-4 pb-12">
+      {/* Header with Add Button */}
+      <div className="flex justify-end items-center mb-2">
+        {canEdit && (
+          <button
+            onClick={() => {
+              setEditItem(null);
+              setShowModal(true);
+            }}
+            className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold px-4 py-2 rounded-xl text-xs shadow-md transition active:scale-95"
+          >
+            + Add Transaction
+          </button>
+        )}
+      </div>
 
-    <input  
-      type="date"  
-      onChange={(e) => setFromDate(e.target.value)}  
-      className="bg-gray-200 dark:bg-[#0f172a] text-black dark:text-white px-3 py-2 rounded-lg"  
-    />  
+      {/* Filter Bar */}
+      <div className="flex flex-wrap gap-2.5 items-center">
+        <input
+          placeholder="Search transactions..."
+          className="bg-white dark:bg-[#0b1329] text-slate-900 dark:text-white px-4 py-2 rounded-xl text-xs outline-none border border-slate-200 dark:border-slate-800 w-56 focus:border-purple-500"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+        />
 
-    <input  
-      type="date"  
-      onChange={(e) => setToDate(e.target.value)}  
-      className="bg-gray-200 dark:bg-[#0f172a] text-black dark:text-white px-3 py-2 rounded-lg"  
-    />  
+        {/* Type pills: all, income, expense */}
+        {["all", "income", "expense"].map((t) => (
+          <button
+            key={t}
+            onClick={() => {
+              setFilter(t);
+              setPage(1);
+            }}
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold capitalize transition ${
+              filter === t
+                ? "bg-purple-600 text-white shadow-sm"
+                : "bg-white dark:bg-[#0b1329] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:text-white"
+            }`}
+          >
+            {t}
+          </button>
+        ))}
 
-    <select  
-      className="bg-gray-200 dark:bg-[#0f172a] text-black dark:text-white px-3 py-2 rounded-lg"  
-      onChange={(e) => setSort(e.target.value)}  
-    >  
-      <option value="desc">Desc</option>  
-      <option value="asc">Asc</option>  
-    </select>  
-  </div>  
+        {/* Categories Dropdown */}
+        <select
+          value={category}
+          onChange={(e) => {
+            setCategory(e.target.value);
+            setPage(1);
+          }}
+          className="bg-white dark:bg-[#0b1329] text-slate-800 dark:text-slate-200 px-3 py-2 rounded-xl text-xs border border-slate-200 dark:border-slate-800 outline-none cursor-pointer"
+        >
+          <option value="all">All Categories</option>
+          {categoriesList.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
 
-  {/* TABLE */}  
-  <div className="bg-white dark:bg-[#0f172a] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">  
-    <div className="grid grid-cols-[1fr_2fr_1.5fr_1fr_1fr_1fr] p-4 text-gray-600 dark:text-gray-400 text-xs border-b border-gray-200 dark:border-gray-700 uppercase">  
-      <span>Date</span>  
-      <span>Description</span>  
-      <span>Category</span>  
-      <span>Type</span>  
-      <span className="text-right">Amount</span>  
-      <span className="text-right">Actions</span>  
-    </div>  
+        {/* Date Inputs */}
+        <input
+          type="date"
+          value={fromDate}
+          onChange={(e) => {
+            setFromDate(e.target.value);
+            setPage(1);
+          }}
+          className="bg-white dark:bg-[#0b1329] text-slate-800 dark:text-slate-200 px-3 py-1.5 rounded-xl text-xs border border-slate-200 dark:border-slate-800 outline-none"
+        />
 
-    {paginated.length === 0 ? (  
-      <div className="p-6 text-center text-gray-500">  
-        No transactions found 🚫  
-      </div>  
-    ) : (  
-      paginated.map((t, i) => (  
-        <div  
-          key={i}  
-          className="grid grid-cols-[1fr_2fr_1.5fr_1fr_1fr_1fr] p-4 border-b border-gray-200 dark:border-gray-800 items-center hover:bg-gray-100 dark:hover:bg-[#020617] transition"  
-        >  
-          <span className="text-gray-700 dark:text-gray-300">{t.date}</span>  
-          <span className="font-medium">{t.title}</span>  
+        <input
+          type="date"
+          value={toDate}
+          onChange={(e) => {
+            setToDate(e.target.value);
+            setPage(1);
+          }}
+          className="bg-white dark:bg-[#0b1329] text-slate-800 dark:text-slate-200 px-3 py-1.5 rounded-xl text-xs border border-slate-200 dark:border-slate-800 outline-none"
+        />
 
-          <span  
-            className={`inline-block px-3 py-1 text-xs rounded-full w-fit ${  
-              categoryColors[t.category] || "bg-gray-200 text-gray-700"  
-            }`}  
-          >  
-            {t.category}  
-          </span>  
+        {/* Sort */}
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          className="bg-white dark:bg-[#0b1329] text-slate-800 dark:text-slate-200 px-3 py-2 rounded-xl text-xs border border-slate-200 dark:border-slate-800 outline-none cursor-pointer"
+        >
+          <option value="desc">Desc</option>
+          <option value="asc">Asc</option>
+        </select>
+      </div>
 
-          <span  
-            className={`px-2 py-1 rounded-full text-xs w-fit ${  
-              t.type === "income"  
-                ? "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400"  
-                : "bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400"  
-            }`}  
-          >  
-            {t.type}  
-          </span>  
+      {/* Table Container */}
+      <div className="card p-0 overflow-hidden mt-4">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-900/40">
+                <th className="py-3.5 px-5">Date</th>
+                <th className="py-3.5 px-5">Description</th>
+                <th className="py-3.5 px-5">Category</th>
+                <th className="py-3.5 px-5">Type</th>
+                <th className="py-3.5 px-5 text-right">Amount</th>
+                <th className="py-3.5 px-5 text-center">Actions</th>
+              </tr>
+            </thead>
 
-          <span  
-            className={`text-right font-semibold ${  
-              t.type === "income"  
-                ? "text-green-600 dark:text-green-400"  
-                : "text-red-600 dark:text-red-400"  
-            }`}  
-          >  
-            {t.type === "income" ? "+" : "-"}₹{t.amount.toLocaleString()}  
-          </span>  
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs">
+              {paginated.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-slate-400">
+                    No transactions found 🚫
+                  </td>
+                </tr>
+              ) : (
+                paginated.map((t) => {
+                  const isIncome = t.type === "income";
+                  const colorClass = categoryColors[t.category] || categoryColors.default;
 
-          <div className="flex justify-end gap-3 text-gray-500">  
-            <button className="hover:text-blue-500">✏️</button>  
-            <button className="hover:text-red-500">🗑️</button>  
-          </div>  
-        </div>  
-      ))  
-    )}  
-  </div>  
+                  return (
+                    <tr
+                      key={t.id}
+                      className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition"
+                    >
+                      <td className="py-3.5 px-5 text-slate-600 dark:text-slate-300 font-mono">
+                        {formatDate(t.date)}
+                      </td>
 
-  {/* PAGINATION */}  
-  <div className="flex justify-center gap-3 mt-4">  
-    {Array.from({ length: totalPages }, (_, i) => (  
-      <button  
-        key={i}  
-        onClick={() => setPage(i + 1)}  
-        className={`px-3 py-1 rounded ${  
-          page === i + 1  
-            ? "bg-purple-600 text-white"  
-            : "bg-gray-200 dark:bg-gray-700"  
-        }`}  
-      >  
-        {i + 1}  
-      </button>  
-    ))}  
-  </div>  
+                      <td className="py-3.5 px-5 font-semibold text-slate-900 dark:text-white">
+                        {t.title}
+                      </td>
 
-  {/* MODAL */}  
-  {showModal && (  
-    <TransactionModal  
-      editData={editIndex !== null ? transactions[editIndex] : null}  
-      onClose={() => {  
-        setShowModal(false);  
-        setEditIndex(null);  
-      }}  
-      onAdd={(tx) => {  
-        if (editIndex !== null) {  
-          updateTransaction(editIndex, tx);  
-        } else {  
-          addTransaction({  
-            ...tx,  
-            date: new Date().toLocaleDateString("en-GB"),  
-          });  
-        }  
+                      <td className="py-3.5 px-5">
+                        <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-medium ${colorClass}`}>
+                          {t.category}
+                        </span>
+                      </td>
 
-        setShowModal(false);  
-        setEditIndex(null);  
-      }}  
-    />  
-  )}  
-</div>
+                      <td className="py-3.5 px-5">
+                        <span
+                          className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-semibold capitalize ${
+                            isIncome
+                              ? "bg-emerald-500/15 text-emerald-500"
+                              : "bg-rose-500/15 text-rose-500"
+                          }`}
+                        >
+                          {t.type}
+                        </span>
+                      </td>
 
-);
+                      <td
+                        className={`py-3.5 px-5 text-right font-bold font-mono ${
+                          isIncome ? "text-emerald-500" : "text-rose-500"
+                        }`}
+                      >
+                        {isIncome ? "+" : "-"}₹{Number(t.amount).toLocaleString()}
+                      </td>
+
+                      <td className="py-3.5 px-5 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          {canEdit ? (
+                            <>
+                              <button
+                                onClick={() => {
+                                  setEditItem(t);
+                                  setShowModal(true);
+                                }}
+                                className="p-1 rounded-lg hover:text-blue-500 transition text-slate-400"
+                                title="Edit transaction"
+                              >
+                                <Pencil size={15} />
+                              </button>
+                              <button
+                                onClick={() => setDeleteTarget(t)}
+                                className="p-1 rounded-lg hover:text-rose-500 transition text-slate-400"
+                                title="Delete transaction"
+                              >
+                                <Trash2 size={15} />
+                              </button>
+                            </>
+                          ) : (
+                            <span className="text-[10px] text-slate-500">Read-only</span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 pt-3">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              className={`w-8 h-8 rounded-lg text-xs font-semibold transition ${
+                currentPage === p
+                  ? "bg-purple-600 text-white shadow-sm"
+                  : "bg-white dark:bg-[#0b1329] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-white"
+              }`}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Add / Edit Transaction Modal */}
+      <TransactionModal
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setEditItem(null);
+        }}
+        onSave={(data) => {
+          if (editItem) {
+            updateTransaction(editItem.id, data);
+          } else {
+            addTransaction(data);
+          }
+          setShowModal(false);
+          setEditItem(null);
+        }}
+        editData={editItem}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        title="Delete Transaction?"
+        message={`Delete "${deleteTarget?.title}"? This cannot be undone.`}
+        confirmText="Delete"
+        confirmVariant="danger"
+        onConfirm={() => {
+          if (deleteTarget) {
+            deleteTransaction(deleteTarget.id);
+            setDeleteTarget(null);
+          }
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
+    </div>
+  );
 }

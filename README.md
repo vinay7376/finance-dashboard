@@ -1,214 +1,147 @@
-# 💰 Finance Dashboard UI
+# 💎 FinanceFlow — Executive Wealth & Cashflow Intelligence OS
 
-This project is a **Finance Dashboard UI** built as part of the **Frontend Developer Intern assignment** for **Zorvyn FinTech Pvt. Ltd.**
+[![React 19](https://img.shields.io/badge/React-19.2-blue?logo=react&style=flat-square)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8.0-purple?logo=vite&style=flat-square)](https://vitejs.dev/)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?logo=tailwind-css&style=flat-square)](https://tailwindcss.com/)
+[![Recharts](https://img.shields.io/badge/Recharts-3.8-22c55e?style=flat-square)](https://recharts.org/)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-12.3-ff0055?logo=framer&style=flat-square)](https://www.framer.com/motion/)
+[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square)](#)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-The goal of this project is to demonstrate frontend development skills including **UI design, component structuring, state management, and data handling** using a clean and interactive interface.
-
----
-
-## 🚀 Live Demo
-
-🔗 https://finance-dashboard-eight-snowy.vercel.app/
-
----
-## 📸 Screenshots
-
-### Dashboard
-![Dashboard](public/screenshots/dashboard.png)
-
-### Transactions
-![Transactions](public/screenshots/transactions.png)
-
-### Insights
-![Insights](public/screenshots/insights.png)
-
-## 📌 Objective
-
-To build a simple and intuitive dashboard that allows users to:
-
-- View overall financial summary  
-- Explore transactions  
-- Understand spending patterns  
-
-This project focuses purely on **frontend implementation using mock/local data**.
+> A modern, production-grade FinTech OS designed for executive cash flow management, granular transaction auditing, and heuristic financial intelligence. Built with **React 19, Vite, Tailwind CSS, Recharts, and Framer Motion**.
 
 ---
 
-## 🧠 Approach
+## 🌐 Live Demo & Deployment
 
-- Designed a clean and modern dashboard layout using **Tailwind CSS**
-- Structured the project into **reusable components**
-- Used **Context API** for global state management
-- Implemented interactive charts using **Recharts**
-- Focused on **usability, responsiveness, and clarity**
+- **Live URL:** [https://finance-dashboard-eight-snowy.vercel.app/](https://finance-dashboard-eight-snowy.vercel.app/)
+- **GitHub Repository:** [https://github.com/vinay7376/finance-dashboard](https://github.com/vinay7376/finance-dashboard)
 
 ---
 
-## ✅ Core Features (As per Assignment)
+## ⚡ Key Engineering & Architecture Highlights
 
-### 📊 1. Dashboard Overview
+### 1. 📊 Executive Control Center (Dashboard)
+- **MoM Delta Analytics:** Real Month-over-Month percentage changes calculated dynamically across periods (Inflow, Outflow, Net Balance).
+- **Cash Flow Velocity Area Chart:** Recharts dual-gradient Spline/Area chart with responsive timeframe filters (`3M`, `6M`, `All Time`).
+- **Donut Expense Allocation:** Interactive SVG slice hovering with live percentage labels and centralized total expenditure.
+- **Monthly Budget Guard:** Dynamic monthly budget tracking with visual thresholds (Healthy `< 70%`, Warning `70-90%`, Over Budget `> 90%`) and admin budget adjustment.
+- **Recent Activity Ledger:** Real-time transaction feed with category badges, date timestamps, and payment method indicators.
 
-- Summary cards:
-  - Total Balance  
-  - Total Income  
-  - Total Expenses  
+### 2. 🧾 Enterprise Transaction Ledger
+- **Debounced Live Search:** Multi-attribute filtering across description, notes, payment mode, and category tags.
+- **Multi-Dimensional Filters:** Filter by Inflow/Outflow, Category dropdown, and custom Date Ranges (`From` / `To`).
+- **Smart Sorting & Pagination:** Sort by newest/oldest and amount (high/low) with customizable rows per page (`5`, `8`, `15`, `25`).
+- **Full Non-Destructive CRUD:**
+  - Create & Edit modals with inline validation and animated state management.
+  - Safe Delete operations protected by confirmation dialogs.
+  - UUID transaction identification preventing index-mismatch corruption during filtering.
 
-- Time-based visualization:
-  - Monthly balance trend (Line Chart)
+### 3. 🧠 Financial Intelligence & Strategic Advisory
+- **100% Dynamic Aggregations:** Zero mock/randomized numbers. All savings rates, burnout velocities, and averages compute directly from ledger data.
+- **Period Comparison Bar Chart:** Period-by-period side-by-side inflow vs outflow breakdown.
+- **Categorical Matrix:** Ranked table with percentage share, entry frequency, and proportional CSS visual progress bars.
+- **Heuristic Advisory Suite:** Built-in financial audits including 50/30/20 budget compliance, discretionary expenditure warnings, and emergency capital runway projection.
 
-- Category-based visualization:
-  - Spending breakdown (Donut Chart)
+### 4. 🛡️ Role-Based Access Control (RBAC Simulation)
+- **Admin Role:** Full permissions to Add, Edit, Delete, Import, and Reset demo data.
+- **Viewer Role:** Safe read-only mode with disabled actions and permission tooltips.
 
----
-
-### 💸 2. Transactions Section
-
-Transaction list with:
-
-- Date  
-- Title  
-- Category  
-- Type (Income/Expense)  
-- Amount  
-
-**Features:**
-
-- Search functionality  
-- Filter (All / Income / Expense)  
-- Category filter  
-- Date range filter  
-- Sorting (Ascending / Descending)  
-- Pagination  
+### 5. 🌍 Multi-Currency & Data Portability
+- **Instant Currency Switcher:** Toggle between **INR (₹)**, **USD ($)**, **EUR (€)**, and **GBP (£)** with global re-formatting.
+- **Export & Backup Engine:** Single-click export to standard CSV (`.csv`) and structured JSON backup (`.json`).
+- **One-Click Demo Data Reset:** Instantly load a comprehensive 6-month realistic financial dataset for testing.
 
 ---
 
-### 👤 3. Role-Based UI (Frontend Simulation)
+## 🛠️ Tech Stack & Tooling
 
-- **Admin**
-  - Can add, edit, and delete transactions  
-
-- **Viewer**
-  - Read-only access  
-
-- Role switching implemented using a dropdown  
-
----
-
-### 📈 4. Insights Section
-
-- Top spending category  
-- Most used category  
-- Average spending  
-- Savings rate  
-- Monthly income vs expense comparison  
-- Category-wise breakdown with percentages  
+| Domain | Technology |
+|---|---|
+| **Framework & Runtime** | React 19, Vite 8 (Rolldown / ESM) |
+| **Styling & Design System** | Tailwind CSS 3.4, PostCSS, Lucide React Icons |
+| **Data Visualization** | Recharts 3.8 (AreaCharts, BarCharts, PieCharts) |
+| **Micro-Animations** | Framer Motion 12 |
+| **Routing & Navigation** | React Router DOM 7 |
+| **State & Persistence** | React Context API, Custom Hooks, LocalStorage |
+| **Code Quality** | ESLint 9 (Strict Hooks & Refresh Rules), Prettier |
 
 ---
 
-### 🧩 5. State Management
+## 📁 Architecture & File Structure
 
-Managed using **React Context API**
-
-Handles:
-
-- Transactions data  
-- Filters  
-- User role  
-
----
-
-### 🎨 6. UI/UX Considerations
-
-- Clean and readable design  
-- Responsive layout (desktop-friendly)  
-- Handles empty states gracefully  
-- Consistent spacing and color system  
-
----
-
-## ✨ Optional Enhancements Implemented
-
-- 🌙 Dark / Light mode (with persistence)  
-- 💾 LocalStorage (data persistence)  
-- 📤 Export transactions as CSV  
-- 🎞️ Smooth animations (Framer Motion)  
-- 🔍 Advanced filtering & search  
-
----
-
-## 🛠️ Tech Stack
-
-- React (Vite)  
-- Tailwind CSS  
-- Recharts  
-- Framer Motion  
-- Context API  
-- LocalStorage  
-
----
-
-## ⚙️ Setup Instructions
-
-```bash
-git clone https://github.com/your-username/finance-dashboard.git
-cd finance-dashboard
-npm install
-npm run dev
-```
-
-## 📁 Project Structure
+```text
 src/
-│
 ├── components/
+│   ├── common/
+│   │   ├── ConfirmModal.jsx     # Reusable confirmation dialog
+│   │   └── Toast.jsx            # Framer-motion floating notification toast
 │   ├── dashboard/
-│   │   ├── CategoryChart.jsx
-│   │   ├── MetricCards.jsx
-│   │   ├── RecentTransactions.jsx
-│   │   └── TrendChart.jsx
-│   │
+│   │   ├── BudgetProgress.jsx   # Budget threshold tracking widget
+│   │   ├── CategoryChart.jsx    # Interactive donut expense breakdown
+│   │   ├── MetricCards.jsx      # MoM metrics & quick action buttons
+│   │   ├── RecentTransactions.jsx # Latest activity stream
+│   │   └── TrendChart.jsx       # Cash flow AreaChart with timeframe selector
 │   ├── insights/
-│   │   └── InsightCards.jsx
-│   │
+│   │   └── InsightCards.jsx     # Runway & burnout velocity cards
 │   ├── layout/
-│   │   ├── Sidebar.jsx
-│   │   └── Topbar.jsx
-│   │
-│   ├── transactions/
-│   │   ├── Filters.jsx
-│   │   ├── TransactionModal.jsx
-│   │   └── TransactionTable.jsx
-│
+│   │   ├── Sidebar.jsx          # Collapsible responsive sidebar with RBAC indicator
+│   │   └── Topbar.jsx           # Currency switcher, export menu & theme toggle
+│   └── transactions/
+│       ├── Filters.jsx          # Search, category, date & sort filter bar
+│       ├── TransactionModal.jsx # Add/Edit modal with validation
+│       └── TransactionTable.jsx # Responsive transaction data grid
+├── data/
+│   └── defaultData.js           # 6-month seed transactions & categories
 ├── hooks/
-│   └── useFinance.jsx
-│
+│   └── useFinance.jsx           # Global finance context, CRUD, RBAC, analytics
 ├── pages/
-│   ├── Dashboard.jsx
-│   ├── Transactions.jsx
-│   └── Insights.jsx
-│
+│   ├── Dashboard.jsx            # Overview analytics page
+│   ├── Insights.jsx             # Deep intelligence & advice page
+│   └── Transactions.jsx         # Full ledger management page
+├── utils/
+│   └── formatters.js            # Currency, date, themes & CSV/JSON export
 ├── App.jsx
 ├── main.jsx
-└── index.css
+└── index.css                    # Typography & glassmorphism theme tokens
+```
 
+---
 
-## 📝 Notes
+## 🚀 Local Development Setup
 
-- This project uses mock/local data (no backend)  
-- Focus is on frontend logic, UI, and interaction design  
-- Insights are dynamically calculated from transaction data
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/vinay7376/finance-dashboard.git
+   cd finance-dashboard
+   ```
 
-## 🙌 Author
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-Vinay Pal
-Frontend Developer Intern Applicant
+3. **Start the local dev server:**
+   ```bash
+   npm run dev
+   ```
 
-## 📎 Submission
-- 🔗 **GitHub Repository:**  
-  [Click Here](https://github.com/vinay7376/finance-dashboard)
+4. **Verify production build & linting:**
+   ```bash
+   npm run lint
+   npm run build
+   ```
 
-- 🌐 **Live Demo:**  
-  [View Project](https://finance-dashboard-eight-snowy.vercel.app/)
+---
 
-## ⭐ Final Note
+## 👨‍💻 Author
 
-This project reflects my approach to building a **clean, functional, and user-friendly frontend application** while keeping the implementation simple and scalable.
+**Vinay Pal**  
+- **GitHub:** [@vinay7376](https://github.com/vinay7376)  
+- **Role:** Frontend Developer / Full Stack Software Engineer  
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
